@@ -3,7 +3,14 @@ class AssetFinder
   def initialize(page)
     @page = page
   end
-  
+
+  def find_all
+    assets = find_hyperlinks << find_js_scripts << find_css_stylesheets << find_images
+    assets = assets.flatten
+    assets = assets.uniq
+    assets
+  end
+
   def find_hyperlinks
     find_resource("a", "href")
   end
@@ -27,16 +34,14 @@ class AssetFinder
     css_components = page.css("#{component_type}")
     css_components.each do |component|
       attribute = component.attributes["#{component_attr}"]
-      resources << attribute.value if resource_valid?(component_type, attribute)
+      resources << attribute.value unless resource_invalid?(component_type, attribute)
     end
-
+    
     resources
   end
 
-  def resource_valid?(type, attribute)
-    !attribute.nil? && 
-    !attribute.value.nil? && 
-    !(type == "a" && attribute.value.include?("http"))
+  def resource_invalid?(type, attribute)
+    attribute.nil? || attribute.value.nil?  
   end
 
   def page
