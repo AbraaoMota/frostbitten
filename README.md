@@ -15,6 +15,7 @@ Firstly, after cloning the repository and following the installation requirement
 After this has completed, run the crawler by calling `ruby run.rb`. 
 The crawler will first ask you for a url to crawl on. The output should be the static assets of the parent url given.
 
+To run the test suite, run `rspec --format doc`.
 
 #### TODO
 Identifiy valid sub links and recurse on those
