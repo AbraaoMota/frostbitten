@@ -5,7 +5,7 @@ class AssetFinder
   end
 
   def find_all
-    assets = find_hyperlinks << find_js_scripts << find_css_stylesheets << find_images
+    assets = find_js_scripts << find_css_stylesheets << find_images << find_hyperlinks
     assets = assets.flatten
     assets = assets.uniq
     assets

@@ -5,8 +5,9 @@ require_relative 'link_utils'
 
 class Crawler
 
-  def initialize(user_input)
+  def initialize(user_input, indexed_parenting)
     @parent_url = user_input
+    @indexed_parenting = indexed_parenting
     @crawled = []
   end
 
@@ -16,18 +17,20 @@ class Crawler
 
     handler = PageHandler.new(url)
     page = handler.document
+    crawled << url
     return if page.nil?
 
     finder = AssetFinder.new(page)
     assets = finder.find_all
     assets.delete(parent_url)
-   
-    # assign_asset_to_closest_valid_parent 
-    json.add(url, LinkUtils.valid_static_assets(assets)) unless assets.empty?
+  
+    valid_assets = LinkUtils.valid_static_assets(assets, parent_url)
+    valid_assets.each do |valid_asset|
+      direct_asset_parent, asset_child = LinkUtils.get_direct_parent_and_child(valid_asset)
+      json.add(direct_asset_parent, valid_asset)
+    end
 
-    crawled << url
-
-    crawlable_child_urls = generate_crawlable_urls(assets) 
+    crawlable_child_urls = LinkUtils.generate_crawlable_urls(assets, parent_url, crawled) 
 
     crawlable_child_urls.each do |child_url|
       child_url = LinkUtils.preprocess_link(child_url)
@@ -35,26 +38,19 @@ class Crawler
     end
   end
 
-  def print
-    puts json.print
+  def print(pretty)
+    puts "\n\n ---- Final output ----"
+    output = pretty ? json.print_pretty : json.print
+    puts output
+  end
+
+  def save
   end
 
   private
 
   def crawled
     @crawled
-  end
-
-  def generate_crawlable_urls(assets)
-    assets.map! { |asset| LinkUtils.preprocess_child_link(asset, parent_url) }
-    assets.reject! { |asset| asset.include?("http") } 
-    assets.map! { |asset| "#{parent_url}/#{asset}" }
-    assets.reject! do |asset|
-      asset.empty? ||
-      crawled.include?(asset) ||
-      !PageHandler.new(asset).valid? 
-    end
-    assets
   end
 
   def json
