@@ -22,7 +22,7 @@ ARGV.each do |arg|
     @save = true
   end
   if arg == "-indexed_parenting"
-    @indexed = true
+    @indexed_parenting = true
   end
 end
 ARGV.clear

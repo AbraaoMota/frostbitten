@@ -31,8 +31,8 @@ module LinkUtils
     !PageHandler.new(asset).valid?
   end
 
-  def self.get_direct_parent_and_child(asset)
-    return File.dirname(asset), File.basename(asset)
+  def self.get_direct_parent(asset)
+    File.dirname(asset)
   end
 
   private 
