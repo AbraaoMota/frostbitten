@@ -56,7 +56,7 @@ class Crawler
       if @indexed_parenting
         original_asset_parent = direct_asset_parent
         if !unindexed_subdir_to_indexed_parent.keys.include?(direct_asset_parent)
-          while PageHandler.new(direct_asset_parent).open_page.nil? || direct_asset_parent != parent_url
+          while PageHandler.new(direct_asset_parent).open_page.nil? && direct_asset_parent != parent_url
             direct_asset_parent = LinkUtils.get_direct_parent(direct_asset_parent)
           end
           unindexed_subdir_to_indexed_parent[original_asset_parent] = direct_asset_parent 

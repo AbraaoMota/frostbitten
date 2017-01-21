@@ -37,7 +37,8 @@ RSpec.describe LinkUtils do
   end
 
   describe "#valid_static_assets" do
-    
+   
+    let(:parent_url) { "http://example.com" } 
     let(:assets) { ["http://example.com/j.js",
                     "http://example.com/c.css",
                     "http://example.com/c.randomfile",
@@ -49,7 +50,7 @@ RSpec.describe LinkUtils do
 
 
     it "returns valid static asset file types" do
-      expect(LinkUtils.valid_static_assets(assets)).to match_array(valid_assets) 
+      expect(LinkUtils.valid_static_assets(assets, parent_url)).to match_array(valid_assets) 
     end
   end
 
