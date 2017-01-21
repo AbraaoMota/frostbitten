@@ -13,7 +13,8 @@ You should then be able to make use of the Gemfile defined for the project. Clon
 After this has completed, run the crawler by calling **`ruby run.rb`**. 
 The crawler will first ask you for a url to crawl on. The output should be the static assets of the parent url given.
 
-The crawler can parse different arguments
+The crawler can parse different arguments, and you can choose whichever you want to use in any run; (**eg.** you can save quiet pretty output using **`ruby run.rb -save -quiet -pretty`**).
+
 Run **`ruby run.rb -h`** for a quick reminder on the script usage.
 
 **`ruby run.rb -pretty`** outputs the JSON in human readable format, without this flag the outputs saved into a file or printed will be in raw JSON.
