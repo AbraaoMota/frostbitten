@@ -4,10 +4,11 @@ class AssetFinder
     @page = page
   end
 
-  def find_all
+  def find_all(parent_url)
     assets = find_js_scripts << find_css_stylesheets << find_images << find_hyperlinks
     assets = assets.flatten
     assets = assets.uniq
+    assets.delete(parent_url)
     assets
   end
 

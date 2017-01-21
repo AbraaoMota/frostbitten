@@ -13,27 +13,23 @@ class Crawler
   end
 
   def crawl(url = parent_url)
-    puts "Crawling through: #{url} ..." unless @quiet
     url = LinkUtils.preprocess_link(url)
     return if crawled?(url)
+
     handler = PageHandler.new(url)
     page = handler.document(@quiet)
     return if page.nil?
+
     crawled << url
 
     finder = AssetFinder.new(page)
-    assets = finder.find_all
-    assets.delete(parent_url)
+    assets = finder.find_all(parent_url) 
   
     add_assets(assets)
-    crawlable_child_urls = LinkUtils.generate_crawlable_urls(assets, parent_url, crawled) 
-
-    crawlable_child_urls.each do |child_url|
-      child_url = LinkUtils.preprocess_link(child_url)
-      crawl(child_url) unless crawled?(child_url)
-    end
+    crawl_subassets(assets)
   end
 
+  
   def output(pretty)
     pretty ? json.print_pretty : json.print
   end
@@ -44,6 +40,14 @@ class Crawler
   end
 
   private
+
+  def crawl_subassets(assets)
+    crawlable_child_urls = LinkUtils.generate_crawlable_urls(assets, parent_url, crawled) 
+    crawlable_child_urls.each do |child_url|
+      child_url = LinkUtils.preprocess_link(child_url)
+      crawl(child_url) unless crawled?(child_url)
+    end
+  end
 
   def crawled?(asset)
     crawled.include?(asset)

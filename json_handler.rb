@@ -15,6 +15,7 @@ class JSONHandler
     else
       url_assets = hash_url_array[0][:assets]
       url_assets << assets
+      url_assets.uniq!
     end
   end
 

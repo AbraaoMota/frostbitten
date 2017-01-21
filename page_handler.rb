@@ -8,6 +8,7 @@ class PageHandler
   end
 
   def open_page(quiet = false)
+    puts "Crawling through: #{url} ..." unless quiet
     open(url)
   rescue OpenURI::HTTPError => e
     if e.message == '404 Not Found'
