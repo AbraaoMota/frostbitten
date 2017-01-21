@@ -5,18 +5,19 @@ require_relative 'link_utils'
 
 class Crawler
 
-  def initialize(user_input, indexed_parenting)
+  def initialize(user_input, indexed_parenting, quiet)
     @parent_url = user_input
     @indexed_parenting = indexed_parenting
     @crawled = []
+    @quiet = quiet
   end
 
   def crawl(url = parent_url)
-    puts "Crawling through: #{url} ..."
+    puts "Crawling through: #{url} ..." unless @quiet
     url = LinkUtils.preprocess_link(url)
     return if crawled?(url)
     handler = PageHandler.new(url)
-    page = handler.document
+    page = handler.document(@quiet)
     return if page.nil?
     crawled << url
 
@@ -33,13 +34,13 @@ class Crawler
     end
   end
 
-  def print(pretty)
-    puts "\n\n ---- Final output ----"
-    output = pretty ? json.print_pretty : json.print
-    puts output
+  def output(pretty)
+    pretty ? json.print_pretty : json.print
   end
 
-  def save
+  def save(pretty)
+    new_file = File.open("frostbitten_output.json", "w")
+    new_file.puts output(pretty)
   end
 
   private
@@ -54,20 +55,28 @@ class Crawler
       direct_asset_parent = LinkUtils.get_direct_parent(valid_asset)
       
       if @indexed_parenting
-        original_asset_parent = direct_asset_parent
-        if !unindexed_subdir_to_indexed_parent.keys.include?(direct_asset_parent)
-          while PageHandler.new(direct_asset_parent).open_page.nil? && direct_asset_parent != parent_url
-            direct_asset_parent = LinkUtils.get_direct_parent(direct_asset_parent)
-          end
-          unindexed_subdir_to_indexed_parent[original_asset_parent] = direct_asset_parent 
-        else
-          direct_asset_parent = unindexed_subdir_to_indexed_parent[direct_asset_parent]
-        end
+        direct_asset_parent = indexed_parenting_resolution(direct_asset_parent)
       end
       json.add(direct_asset_parent, valid_asset)
     end
   end
 
+  def indexed_parenting_resolution(direct_asset_parent)
+    original_asset_parent = direct_asset_parent
+    if !unindexed_subdir_to_indexed_parent.keys.include?(direct_asset_parent)
+      while PageHandler.new(direct_asset_parent).try_open.nil? && direct_asset_parent != parent_url
+        direct_asset_parent = LinkUtils.get_direct_parent(direct_asset_parent)
+      end
+      unindexed_subdir_to_indexed_parent[original_asset_parent] = direct_asset_parent 
+    else
+      direct_asset_parent = unindexed_subdir_to_indexed_parent[direct_asset_parent]
+    end
+
+    direct_asset_parent
+  end
+
+  # Map of a subdirectory not indexed on the web to the closest
+  # indexed parent
   def unindexed_subdir_to_indexed_parent
     @unindexed_subdir_to_indexed_parent ||= {}
   end

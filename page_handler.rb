@@ -7,11 +7,11 @@ class PageHandler
     @url = url
   end
 
-  def open_page
+  def open_page(quiet = false)
     open(url)
   rescue OpenURI::HTTPError => e
     if e.message == '404 Not Found'
-      puts "This page does not exist! Skipping..."
+      puts "This page does not exist! Skipping..." unless quiet
       nil
     end
   rescue Exception => e
@@ -19,8 +19,14 @@ class PageHandler
     nil
   end
 
-  def document
-    file = open_page
+  def try_open
+    open(url)
+  rescue Exception => e
+    nil
+  end
+
+  def document(quiet = false)
+    file = open_page(quiet)
     Nokogiri::HTML(file)
   end
 
