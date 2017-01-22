@@ -2,6 +2,12 @@
 
 ## A simple recursive web crawler to find static assets in a website
 
+### About
+
+Frostbitten (inspired by our hairy buddies in Skyrim) is a simple web crawler that attempts to find static assets in a website.
+
+This is currently limited to javascript, css and some image types, but is easily extensible. It will find assets only belonging to the given domain.
+
 ### Installation
 
 Make sure you have ruby installed, as well as bundler.

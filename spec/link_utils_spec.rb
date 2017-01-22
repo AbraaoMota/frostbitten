@@ -54,5 +54,33 @@ RSpec.describe LinkUtils do
     end
   end
 
+  describe "#invalid_asset?" do
+
+    let(:crawled)     { ["http://example.com", "http://example.com/css"] }
+    let(:empty_asset) { "" }
+    let(:crawled_asset) { "http://example.com/css" }
+    let(:mistyped_asset) { "://_www.__asdz" }
+    let(:uncrawled_asset) { "http://example.com/css/a.jpg" }
+
+    it "returns true for empty assets" do
+      expect(LinkUtils.invalid_asset?(empty_asset, crawled)).to be true
+    end
+
+    it "returns true for assets which have already been crawled" do
+      expect(LinkUtils.invalid_asset?(crawled_asset, crawled)).to be true
+    end
+
+    it "returns true if the asset does not confirm with valid url standards" do
+      expect(LinkUtils.invalid_asset?(mistyped_asset, crawled)).to be true
+    end
+
+    it "returns false for valid, uncrawled assets" do
+      expect(LinkUtils.invalid_asset?(uncrawled_asset, crawled)).to be false
+    end
+  end
+
+  describe "#generate_crawlable_urls" do
+  end
+
 end
 

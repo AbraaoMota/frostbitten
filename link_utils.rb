@@ -18,10 +18,11 @@ module LinkUtils
   end
 
   def self.generate_crawlable_urls(assets, parent_url, crawled)
-    assets.map!    { |asset| LinkUtils.preprocess_child_link(asset, parent_url) }
-    assets.reject! { |asset| asset.include?("http") } 
-    assets.map!    { |asset| "#{parent_url}/#{asset}" }
-    assets.reject! { |asset| invalid_asset?(asset, crawled) }
+    assets.map! do |asset|
+      processed_link = LinkUtils.preprocess_child_link(asset, parent_url)
+      "#{parent_url}/#{processed_link}"
+    end
+    assets.reject! { |asset| invalid_asset?(asset, crawled) || external_asset(asset, parent_url) }
     assets
   end
 
@@ -35,7 +36,11 @@ module LinkUtils
     File.dirname(asset)
   end
 
-  private 
+  private
+
+  def self.external_asset(asset, parent_url)
+    asset.include?("http") && !asset.include?(parent_url)
+  end 
 
   def self.asset_type(asset)
     File.extname(asset).downcase
@@ -51,7 +56,6 @@ module LinkUtils
     remove_leading_symbols(name)
   end
 
-
   def self.remove_leading_symbols(name)
     name[0] == '/' || name[0] == '#' ? name[1..name.length] : name
   end
@@ -61,13 +65,11 @@ module LinkUtils
   end
 
   def self.escape_spaces(name)
-    name.sub!(' ', '%20') if name.include? ' '
-    name
+    name.include?(' ') ? name.sub!(' ', '%20') : name
   end
 
   def self.remove_slash_suffix(name)
-    name = name[0..-2] if name.end_with? '/'
-    name
+    name.end_with?('/') ? name[0..-2] : name
   end
 
   def self.static_asset_file_endings

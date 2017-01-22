@@ -42,7 +42,7 @@ class Crawler
   private
 
   def crawl_subassets(assets)
-    crawlable_child_urls = LinkUtils.generate_crawlable_urls(assets, parent_url, crawled) 
+    crawlable_child_urls = LinkUtils.generate_crawlable_urls(assets, parent_url, crawled)
     crawlable_child_urls.each do |child_url|
       child_url = LinkUtils.preprocess_link(child_url)
       crawl(child_url) unless crawled?(child_url)
@@ -56,8 +56,7 @@ class Crawler
   def add_assets(assets)
     valid_assets = LinkUtils.valid_static_assets(assets, parent_url)
     valid_assets.each do |valid_asset|
-      direct_asset_parent = LinkUtils.get_direct_parent(valid_asset)
-      
+      direct_asset_parent = LinkUtils.get_direct_parent(valid_asset)      
       if @indexed_parenting
         direct_asset_parent = indexed_parenting_resolution(direct_asset_parent)
       end

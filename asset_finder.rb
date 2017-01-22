@@ -42,7 +42,10 @@ class AssetFinder
   end
 
   def resource_invalid?(type, attribute)
-    attribute.nil? || attribute.value.nil?  
+    attribute.nil? ||
+    attribute.value.nil? || 
+    attribute.value.include?("http") ||
+    attribute.value.include?("www")
   end
 
   def page
