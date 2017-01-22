@@ -1,3 +1,5 @@
+require_relative "page_handler"
+
 module LinkUtils
 
   def self.preprocess_link(link)
@@ -18,11 +20,10 @@ module LinkUtils
   end
 
   def self.generate_crawlable_urls(assets, parent_url, crawled)
-    assets.map! do |asset|
-      processed_link = LinkUtils.preprocess_child_link(asset, parent_url)
-      "#{parent_url}/#{processed_link}"
-    end
-    assets.reject! { |asset| invalid_asset?(asset, crawled) || external_asset(asset, parent_url) }
+    assets.map! { |asset| LinkUtils.preprocess_child_link(asset, parent_url) }
+    assets.reject! { |asset| external_asset?(asset, parent_url) }
+    assets.map! { |asset| "#{parent_url}/#{asset}" }
+    assets.reject! { |asset| invalid_asset?(asset, crawled) }
     assets
   end
 
@@ -38,7 +39,7 @@ module LinkUtils
 
   private
 
-  def self.external_asset(asset, parent_url)
+  def self.external_asset?(asset, parent_url)
     asset.include?("http") && !asset.include?(parent_url)
   end 
 
@@ -75,5 +76,4 @@ module LinkUtils
   def self.static_asset_file_endings
     [ "css", "js", "jpg", "jpeg", "png", "ico", "bmp", "pict" ]
   end
-
 end
